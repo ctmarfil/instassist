@@ -1,0 +1,48 @@
+<!doctype html>
+<html ng-app="instassist">
+    <head>
+        <meta charset="utf-8">
+        <title>Instassist</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="js/instassist.js"></script>
+        <script src="js/app-controller.js"></script>
+        
+    </head>
+    <body>
+        <div class="main-navbar navbar navbar-default navbar-fixed-top">
+            <div class="brand-name" ng-controller="AppController as app">
+                <h4>{{app.name}}</h4>
+            </div>
+        </div>
+
+        <div class="row settings">
+            <div class="col left col-xs-1 col-sm-2 col-md-2 col-lg-3"></div>
+            <div class="col center col-xs-10 col-sm-8 col-md-8 col-lg-6">
+                <div class="section">
+                    <div class="section-title">Settings</div>
+                    <div class="section-nav">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#emailsettings">E-mail Follow Up</a></li>
+                            <li><a data-toggle="tab" href="#rulessettings">Rules and Filters</a></li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div id="emailsettings" class="tab-pane fade in active">
+                            <p>Some content.</p>
+                        </div>
+                        <div id="rulessettings" class="tab-pane fade">
+                            <p>Some content in menu 1.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col right col-xs-1 col-sm-2 col-md-2 col-lg-3"></div>
+        </div>
+    </body>
+</html>

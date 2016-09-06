@@ -1,0 +1,1 @@
+var Instassist = angular.module('instassist', []);

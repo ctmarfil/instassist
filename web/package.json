@@ -1,0 +1,12 @@
+{
+  "name": "Instassist",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "latest",
+    "fs": "latest"
+},
+  "scripts": {
+    "start": "node app.js"
+  }
+}

@@ -1,0 +1,74 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  padding: 50px 0 0 0;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+
+.main-navbar {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    background-color: #F06730;
+}
+
+    .main-navbar .brand-name {
+        float: left;
+        margin: 10px ;
+    }
+
+        .brand-name h4 {
+            margin: 5px;
+            color: #fff;
+        }
+
+.row.settings {
+    margin-top: 0px;
+}
+    .row.settings .col {
+        padding: 2px;
+    }
+
+.section {
+    margin: 2px;
+    padding: 5px;
+    min-width: 400px;
+}
+
+    .section-title {
+        font-size: 16pt;
+        margin-bottom: 10px;
+    }
+
+.nav li a{
+    color: #aaa;
+}
+
+.nav li.active a {
+    color: #F06730;
+    font-weight: bold;
+}
+
+@media (max-width: 500px) {
+    .section {
+        width: 400px;
+    }
+}
+
+/*@media (max-width: 800px) {
+    body {
+        padding: 0;
+    }
+    .col.left {
+        display: none;
+    }
+    .col.right {
+        display: none;
+    }
+    .col.center {
+        width: auto;
+        padding: 10px;
+    }
+}*/
