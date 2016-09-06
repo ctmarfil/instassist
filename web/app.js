@@ -3,7 +3,9 @@ var express = require('express'),
     
 var app    = express(),
     mytime = new Date(),
-    port = process.env.PORT || 5000;
+    port = process.env.PORT || 5000,
+    awsAccessKey = process.env.awsAccessKey || '',
+    awsSecretKey = process.env.awsSecretKey || '';
     
 app.use(function(req, res, next) {
     res.header('X-Frame-Options', 'DENY');
@@ -35,6 +37,45 @@ fs.readdir('.', function (err, folders) {
         app.use('/' + folder, express.static(folder));
     });
 });
+
+// DynamoDB
+var aws = require("aws-sdk");
+
+aws.config.update({
+  region: "ap-southeast-1",
+  accessKeyId: awsAccessKey,
+  secretAccessKey: awsSecretKey
+});
+
+var db = new aws.DynamoDB.DocumentClient();
+var table = "instassist-entities";
+
+var params = {
+    TableName: table,
+    Key: {
+        entityid: "Michael.Lucero@asurion.com",
+    }
+}
+
+db.get(params, function(err, data) {
+    if (err) {
+        console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+    } else {
+        console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+    }
+});
+
+// var params = {
+//    TableName: "instassist-entities"
+// };
+
+// db.scan(params, function(err, data) {
+//     console.log("data", data);
+//    if (err)
+//        console.log(JSON.stringify(err, null, 2));
+//    else
+//        console.log(JSON.stringify(data, null, 2));
+// });
 
 app.listen(port);
 console.log('Welcome to INSTASSIST!!! Node server running on http://localhost:' + port + ', time: '+mytime);
