@@ -24,6 +24,20 @@ body {
             color: #fff;
         }
 
+    .login {
+        margin: 5px;
+        float: right;
+    }
+
+    .account {
+
+    }
+        .account .account-email {
+            float: right;
+            margin: 14px;
+            color: #fff;
+        }
+
 .row.settings {
     margin-top: 0px;
 }
@@ -49,6 +63,139 @@ body {
 .nav li.active a {
     color: #F06730;
     font-weight: bold;
+}
+
+ul.unstyled {
+    padding: 0px;
+}
+
+.email-items {
+    list-style: none;
+}
+
+.email-items > div {
+    padding: 5px;
+    margin: 10px;
+    /*border: 1px solid gray;*/
+}
+
+.email-delete {
+    background: url("../img/delete-10x10.png") no-repeat center;
+    width: 10px;
+    height: 10px;
+    float: right;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.emailsettings-save, .rulessettings-save {
+    background: url("../img/save-16x16.png") no-repeat right;
+    width: 50px;
+}
+
+.emailsettings-add, .priority-add {
+    background: url("../img/add-16x16.png") no-repeat right;
+    width: 80px;
+}
+
+.email-config {
+    background-color: #eee;
+    border: 1px solid #aaa;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.remind-label {
+    margin: 5px;
+    width: auto;
+    float: left;
+}
+
+.loader {
+    background: url("../img/loader-64x64.gif") no-repeat center;
+    width: 100%;
+    height: 100px;
+}
+
+.action-link {
+    float: right;
+    margin: 10px;
+    cursor: pointer;
+    color: #F06730;
+}
+
+.action-link:hover {
+    text-decoration: underline;
+}
+
+.rulessettings {
+    margin: 10px;
+}
+
+.settings-gcmid {
+    width: 100%;
+}
+
+.rules-header {
+    color: #F06730;
+}
+
+.rules-fieldrow {
+    margin: 5px;
+    padding: 2px;
+}
+
+.priority-fieldrow {
+    float: left;
+    border-bottom: 1px dotted #aaa;
+}
+
+.rules-label {
+    margin: 8px 10px 10px 0px;
+    float: left;
+}
+
+.full-row {
+    float: none;
+}
+
+.priority-field {
+    width: 250px;
+    margin: 5px 0px;
+    float: left;
+}
+
+.priority-add {
+    float: left;
+    width: 50px;
+}
+
+.rules-instruction {
+    color: #aaa;
+    font-size: 9pt;
+    background-color: #eee;
+    border: 1px solid #aaa;
+    padding: 10px;
+}
+
+.rules-prioritylist {
+    float: left;
+    width: 100%;
+    padding: 0px;
+}
+
+.prioritylist {
+    margin: 0px;
+    padding: 0px;
+}
+
+.priority-item {
+    list-style: none;
+    padding: 5px;
+}
+
+.priority-item.odd {
+    background-color: #FED3C0;
 }
 
 @media (max-width: 500px) {

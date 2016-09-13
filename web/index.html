@@ -7,21 +7,35 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/bootstrap.css">
         <link rel="stylesheet" href="css/main.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="js/libs/angular.min.js"></script>
+        <script src="js/libs/jquery.min.js"></script>
+        <script src="js/libs/bootstrap.min.js"></script>
         <script src="js/instassist.js"></script>
         <script src="js/app-controller.js"></script>
         
     </head>
-    <body>
+    <body ng-controller="AppController as app">
         <div class="main-navbar navbar navbar-default navbar-fixed-top">
-            <div class="brand-name" ng-controller="AppController as app">
+            <div class="login" ng-show="app.showLogin">
+                <form class="form-inline" ng-submit="app.login()">
+                    <div class="form-group">
+                        <input type="email" class="form-control" placeholder="your e-mail here..." ng-model="app.email">
+                    </div>
+                    <button type="submit" class="btn btn-default">Login</button>
+                </form>
+            </div>
+            <div class="account" ng-show="app.showAccount">
+                <div class="account-email">{{app.email}}</div>
+            </div>
+            <div class="brand-name">
                 <h4>{{app.name}}</h4>
             </div>
+            
         </div>
 
-        <div class="row settings">
+        <div class="row loader ng-hide" ng-show="app.showLoader"></div>
+
+        <div class="row settings ng-hide" ng-show="app.showSettings">
             <div class="col left col-xs-1 col-sm-2 col-md-2 col-lg-3"></div>
             <div class="col center col-xs-10 col-sm-8 col-md-8 col-lg-6">
                 <div class="section">
@@ -35,12 +49,112 @@
                     <div class="tab-content">
                         <div id="emailsettings" class="tab-pane fade in active">
                             <div class="settings emailsettings">
-
+                                <ul class="unstyled email-followups">
+                                    <li class="email-items" ng-repeat="email in app.emails">
+                                        <div>
+                                            <div class="email-delete" ng-click="app.deleteEmail(email)"></div>
+                                            <input type="hidden" class="email-id" value="{{email.id}}">
+                                            <input type="hidden" class="email-reminderkey" value="{{email.reminder}}">
+                                            <input type="text" class="email-key" value="{{email.key}}" placeholder="e-mail key...">@instassist.com
+                                            <div class="email-config">
+                                                <div class="remind-label">Remind me</div>
+                                                <div class="remind-dropdown btn-group">
+                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        {{app.getOptionLabel(email.reminder, app.reminderOptions)}}
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-repeat="reminder in app.reminderOptions">
+                                                            <a href="#" ng-click="app.selectReminder(email, reminder.key, reminder.label)">{{reminder.label}}</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="emailsettings-action">
+                                    <div class="emailsettings-add action-link" ng-click="app.addNewEmail()">ADD NEW</div>
+                                    <div class="emailsettings-save action-link" ng-click="app.saveEmailChanges()">SAVE</div>
+                                </div>
                             </div>
                         </div>
                         <div id="rulessettings" class="tab-pane fade">
                             <div class="settings rulessettings">
-                                
+                                <div class="rules-header">General Settings</div>
+                                <!--GCMID-->
+                                <div class="rules-fieldrow">
+                                    GCMID:&nbsp;<textarea class="form-control settings-gcmid" row="8">{{app.gcmid}}</textarea>
+                                </div>
+                                <!--AUTO MODE-->
+                                <div class="rules-fieldrow">
+                                    <div class="rules-label automode-label">Auto Mode</div>
+                                    <div class="automode-dropdown btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{app.getOptionLabel(app.settings.autoMode, app.autoModeOptions)}}
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li ng-repeat="auto in app.autoModeOptions">
+                                                <a href="#" ng-click="app.selectAuto(auto.key)">{{auto.label}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!--START OF THE WEEK-->
+                                <div class="rules-fieldrow">
+                                    <div class="rules-label startweek-label">Start of the Week</div>
+                                    <div class="startweek-dropdown btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{app.getOptionLabel(app.settings.firstDayOfWeek, app.daysOfTheWeek)}}
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li ng-repeat="day in app.daysOfTheWeek">
+                                                <a href="#" ng-click="app.selectStartWeek(day.key)">{{day.label}}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="rules-header">E-mail Settings</div>
+
+                                <!--PRIORITY EMAILS-->
+                                <div class="rules-fieldrow priority-fieldrow">
+                                    <div class="rules-label full-row priorityemail-label">Priority E-mails</div>
+                                    <div class="rules-instruction">Add the following e-mail addresses that will be considered high priority. E-mail addresses under this will remind you everyday.</div>
+                                    <div class="rules-add">
+                                        <input type="email" class="priority-field" placeholder="e-mail here..." ng-model="app.priority.email">
+                                        <div class="priority-add action-link" ng-click="app.addPriority('email')">Add</div>
+                                    </div>
+                                    <div class="rules-prioritylist">
+                                        <ul class="prioritylist">
+                                            <li class="priority-item" ng-repeat="email in app.settings.priorityEmails" ng-class-odd="'odd'">
+                                                <div class="priority-label">{{email}}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!--PRIORITY SUBJECTS-->
+                                <div class="rules-fieldrow priority-fieldrow">
+                                    <div class="rules-label full-row priorityemail-label">Priority E-mail Subjects</div>
+                                    <div class="rules-instruction">Add the following e-mail subjects that will be considered high priority. E-mail subjects under this will remind you everyday.</div>
+                                    <div class="rules-add">
+                                        <input type="text" class="priority-field" placeholder="subject here..." ng-model="app.priority.subject">
+                                        <div class="priority-add action-link" ng-click="app.addPriority('subject')">Add</div>
+                                    </div>
+                                    <div class="rules-prioritylist">
+                                        <ul class="prioritylist">
+                                            <li class="priority-item" ng-repeat="subject in app.settings.prioritySubjects" ng-class-odd="'odd'">
+                                                <div class="priority-label">{{subject}}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="rulessettings-action">
+                                    <div class="emailsettings-save action-link" ng-click="app.saveRulesSettings()">SAVE</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -48,5 +162,23 @@
             </div>
             <div class="col right col-xs-1 col-sm-2 col-md-2 col-lg-3"></div>
         </div>
+
+        <div id="confirm" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h5 class="modal-title">{{app.confirm.title}}</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{app.confirm.msg}}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{app.confirm.noBtn}}</button>
+                        <button type="button" class="btn btn-primary" ng-click="app.confirm.yesCallback()">{{app.confirm.yesBtn}}</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </body>
 </html>

@@ -6,6 +6,38 @@ var app    = express(),
     port = process.env.PORT || 5000,
     awsAccessKey = process.env.awsAccessKey || '',
     awsSecretKey = process.env.awsSecretKey || '';
+
+var aws = require("aws-sdk");
+    aws.config.update({
+        region: "ap-southeast-1",
+        accessKeyId: awsAccessKey,
+        secretAccessKey: awsSecretKey
+    });
+var db = new aws.DynamoDB.DocumentClient(),
+    table = "instassist-entities";
+
+var getQuery = function(req, key) {
+    return (req && req.query && req.query[key]) ? req.query[key] : null;
+}
+
+/**
+ * sends JSON response
+ */
+var sendErrorResponse = function(res, err, code) {
+    console.log("Sending Error Response - ", err);
+    res.writeHead(code, {"Content-Type": "application/json"});
+    res.end();
+}
+
+/** 
+ * send Ok or Success response
+ */
+var sendSuccessResponse = function(res, data) {
+    console.log("Sending Success Response");
+    res.writeHead(200, {"Content-Type": "application/json"});
+    res.write(JSON.stringify(data));
+    res.end();
+}
     
 app.use(function(req, res, next) {
     res.header('X-Frame-Options', 'DENY');
@@ -30,6 +62,30 @@ app.get('/', function(req, res){
     });
 });
 
+app.get('/settings', function(req, res) {
+    var email = getQuery(req, 'email');
+
+    if (email) {
+        var params = {
+            TableName: table,
+            Key: {
+                entityid: email,
+            }
+        }
+
+        db.get(params, function(err, data) {
+            if (err) {
+                console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+                sendErrorResponse(res, error, 500);
+            } else {
+                sendSuccessResponse(res, data);
+            }
+        });
+    } else {
+        sendErrorResponse(res, 'Bad Request', 400);
+    }
+});
+
 // Read folder and register each directory
 fs.readdir('.', function (err, folders) {
     if (err) throw err;
@@ -38,32 +94,15 @@ fs.readdir('.', function (err, folders) {
     });
 });
 
-// DynamoDB
-var aws = require("aws-sdk");
 
-aws.config.update({
-  region: "ap-southeast-1",
-  accessKeyId: awsAccessKey,
-  secretAccessKey: awsSecretKey
-});
 
-var db = new aws.DynamoDB.DocumentClient();
-var table = "instassist-entities";
 
-var params = {
-    TableName: table,
-    Key: {
-        entityid: "Michael.Lucero@asurion.com",
-    }
-}
 
-db.get(params, function(err, data) {
-    if (err) {
-        console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
-    } else {
-        console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
-    }
-});
+
+
+
+
+
 
 // var params = {
 //    TableName: "instassist-entities"
