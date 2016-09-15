@@ -4,8 +4,13 @@ var express = require('express'),
 var app    = express(),
     mytime = new Date(),
     port = process.env.PORT || 5000,
+    bodyParser = require('body-parser'),
     awsAccessKey = process.env.awsAccessKey || '',
     awsSecretKey = process.env.awsSecretKey || '';
+
+// for JSON and POST
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 var aws = require("aws-sdk");
     aws.config.update({
@@ -18,6 +23,10 @@ var db = new aws.DynamoDB.DocumentClient(),
 
 var getQuery = function(req, key) {
     return (req && req.query && req.query[key]) ? req.query[key] : null;
+}
+
+var getPost = function(req, key) {
+    return (req && req.body && req.body[key]) ? req.body[key] : null;
 }
 
 /**
@@ -76,6 +85,46 @@ app.get('/settings', function(req, res) {
         db.get(params, function(err, data) {
             if (err) {
                 console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+                sendErrorResponse(res, error, 500);
+            } else {
+                sendSuccessResponse(res, data);
+            }
+        });
+    } else {
+        sendErrorResponse(res, 'Bad Request', 400);
+    }
+});
+
+/**
+ * Update and insert new settings
+ */
+app.post('/settings', function(req, res) {
+    var followups = getPost(req, "followups"),
+        settings = getPost(req, "settings")
+        email = getPost(req, "email");
+
+    console.log(req.body);
+    console.log("email >>> ", email);
+    console.log("settings >>> ", settings);
+    console.log("followups >>> ", followups);
+
+    if (email && followups && settings) {
+        var params = {
+            TableName: table,
+            Key: {
+                entityid: email
+            },
+            UpdateExpression: "set settings = :settings, followUps = :followups",
+            ExpressionAttributeValues:{
+                ":settings":settings,
+                ":followups":followups
+            },
+            ReturnValues:"UPDATED_NEW"
+        }
+
+        db.update(params, function(err, data) {
+            if (err) {
+                console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
                 sendErrorResponse(res, error, 500);
             } else {
                 sendSuccessResponse(res, data);

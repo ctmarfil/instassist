@@ -7,10 +7,12 @@ Instassist.controller('AppController', function($scope, $http, $window) {
     $o.showLogin = true;
     $o.showAccount = false;
     $o.showSettings = false;
+    $o.saveLoader = false;
+    $o.saveButton = true;
     $o.settings = {};
     $o.confirm = {};
 
-    function showModal(options) {
+    function showConfirmModal(options) {
         $o.confirm = {
             title: options.title,
             msg: options.msg,
@@ -20,6 +22,17 @@ Instassist.controller('AppController', function($scope, $http, $window) {
             data: (options && options.data) ? options.data : {}
         }
         $('#confirm').modal("show");
+    }
+
+    function showInformModal(options) {
+        $o.inform = {
+            title: options.title,
+            msg: options.msg,
+            okBtn: (options && options.yesBtn) ? options.yesBtn : "Ok",
+            okCallback: (options && options.okCallback) ? options.okCallback : function() {$('#inform').modal("hide");},
+            data: (options && options.data) ? options.data : {}
+        }
+        $('#inform').modal("show");
     }
 
     /**
@@ -188,7 +201,7 @@ Instassist.controller('AppController', function($scope, $http, $window) {
                 console.log("New set of e-mail follow ups >> ", $o.emails);
             }
         }
-        showModal(modal_options);
+        showConfirmModal(modal_options);
     }
 
     $o.addNewEmail = function() {
@@ -213,17 +226,109 @@ Instassist.controller('AppController', function($scope, $http, $window) {
         }
     }
 
-    $o.changeEmailKey = function() {
-        /**
-         * TODO: catch whenever you change email key
-         */
+    $o.deletePriority = function(priority, ptype) {
+        ptype = ptype || 'email';
+        var new_priorities = [];
+        var priorities = (ptype === 'email') ? $o.settings.priorityEmails : $o.settings.prioritySubjects;
+        if (priority) {
+            for (var x=0; x<priorities.length; x++) {
+                var p = priorities[x];
+                if (p !== priority) {
+                    new_priorities.push(p);
+                }
+            }
+
+            if (ptype === 'email') {
+                $o.settings.priorityEmails = new_priorities;
+                console.log("New set of priority e-mails >>> ", $o.settings.priorityEmails);
+            } else if (ptype === 'subject') {
+                $o.settings.priorityEmails = new_priorities;
+                console.log("New set of priority e-mail subjects >>> ", $o.settings.prioritySubjects);
+            }
+        }
     }
 
     $o.saveEmailChanges = function() {
+        for (var x=0; x<$o.emails.length; x++) {
+            var email = $o.emails[x];
+            var id = email.id,
+                key = email.key,
+                reminder = email.reminder;
+
+            if (!key) {
+                var elem = $('#email-items-' + id);
+                email.key = elem.find('.email-key').val();
+            }
+        }   
+
         console.log("Saving e-mail changes >> ", $o.emails);
+
+        var url = "/settings";
+        var data = {
+            email: $o.email,
+            followups: $o.emails,
+            settings: $o.settings
+        }
+
+        $o.saveButton = false;
+        $o.saveLoader = true;
+        $http.post(url, data)
+            .then(function successCallback(response) {
+                console.log(response);
+                $o.saveButton = true;
+                $o.saveLoader = false;
+
+                var modal_options = {
+                    title: "Success!",
+                    msg: "Your settings has been saved."
+                };
+                showInformModal(modal_options);
+                
+            }, function errorCallback(response) {
+                $o.saveButton = true;
+                $o.saveLoader = false;
+                var modal_options = {
+                    title: "Error!",
+                    msg: "An error occurred while saving your settings."
+                };
+                showInformModal(modal_options);
+            });
+    
     }
 
     $o.saveRulesSettings = function() {
         console.log("Saving the following settings >>> ", $o.gcmid, $o.settings);
+
+        var url = "/settings";
+        var data = {
+            email: $o.email,
+            followups: $o.emails,
+            settings: $o.settings
+        }
+
+        $o.saveButton = false;
+        $o.saveLoader = true;
+        $http.post(url, data)
+            .then(function successCallback(response) {
+                console.log(response);
+                $o.saveButton = true;
+                $o.saveLoader = false;
+
+                var modal_options = {
+                    title: "Success!",
+                    msg: "Your settings has been saved."
+                };
+                showInformModal(modal_options);
+                
+            }, function errorCallback(response) {
+                $o.saveButton = true;
+                $o.saveLoader = false;
+
+                var modal_options = {
+                    title: "Error!",
+                    msg: "An error occurred while saving your settings."
+                };
+                showInformModal(modal_options);
+            });
     }
 });
